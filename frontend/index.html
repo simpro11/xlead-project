@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xlead - Interactive Prototype</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+    </style>
+    <script>
+    </script>
+</head>
+<body class="antialiased bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+    <!-- =========== Onboarding Wizard (Initially Hidden) =========== -->
+    <div id="onboardingWizard" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+        <div class="card w-full max-w-xl mx-auto p-6 sm:p-8 space-y-6">
+            <!-- Step Indicator -->
+            <p id="wizardStepIndicator" class="text-center font-semibold text-gray-600 dark:text-gray-400">Step 1 of 3</p>
+
+            <!-- Step 1: Business Fundamentals -->
+            <div id="wizardStep1" class="wizard-step">
+                <h3 class="text-2xl font-bold text-center">Welcome to Xlead!</h3>
+                <p class="text-center text-gray-600 dark:text-gray-300 mt-1 mb-6">Let's set up your profile.</p>
+                <div class="space-y-4">
+                    <div>
+                        <label for="wizard-industry" class="block font-medium text-sm mb-1">Your Industry</label>
+                        <select id="wizard-industry" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                            <option>Technology (SaaS)</option>
+                            <option>Digital Marketing (Agency)</option>
+                            <option>eCommerce</option>
+                            <option>Real Estate</option>
+                            <option>Consulting</option>
+                            <option>Freelancer</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="wizard-product-description" class="block font-medium text-sm mb-1">Briefly describe your product or service</label>
+                        <textarea id="wizard-product-description" rows="4" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., We provide AI-powered chatbots for customer support."></textarea>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button id="wizard-next-1" class="w-full sm:w-auto px-6 py-3 text-white font-semibold rounded-lg btn-gradient">Next Step</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Target Audience -->
+            <div id="wizardStep2" class="wizard-step hidden">
+                <h3 class="text-2xl font-bold text-center">Tell us about your customers.</h3>
+                 <p class="text-center text-gray-600 dark:text-gray-300 mt-1 mb-6">This helps us find better leads for you.</p>
+                <div class="space-y-4">
+                    <div>
+                        <label for="wizard-ideal-customer" class="block font-medium text-sm mb-1">Who is your ideal customer?</label>
+                        <input type="text" id="wizard-ideal-customer" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Small business owners, marketing managers">
+                    </div>
+                    <div>
+                        <label for="wizard-customer-problems" class="block font-medium text-sm mb-1">What main problems do you solve for them?</label>
+                        <textarea id="wizard-customer-problems" rows="4" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Reducing response times, increasing sales conversions"></textarea>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-between items-center">
+                    <button id="wizard-back-2" class="px-6 py-3 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Back</button>
+                    <button id="wizard-next-2" class="px-6 py-3 text-white font-semibold rounded-lg btn-gradient">Next Step</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Keywords & Final Setup -->
+            <div id="wizardStep3" class="wizard-step hidden">
+                <h3 class="text-2xl font-bold text-center">Keywords & Notifications</h3>
+                <p class="text-center text-gray-600 dark:text-gray-300 mt-1 mb-6">Set up your first monitor and get alerts.</p>
+                <div class="space-y-6">
+                    <div>
+                        <label for="wizard-keywords" class="block font-medium text-sm mb-1">Keywords to Monitor</label>
+                        <input type="text" id="wizard-keywords" placeholder="e.g., best CRM, social media tool, looking for developer" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                         <label class="block font-medium text-sm mb-1">Telegram Chat ID (for notifications)</label>
+                         <div class="space-y-2 text-xs text-gray-700 dark:text-gray-300 mt-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border dark:border-gray-600">
+                                <p>Get your User ID from <code class="font-mono bg-gray-200 dark:bg-gray-600 rounded px-1 py-0.5">@userinfobot</code> on Telegram, then start our bot <code class="font-mono bg-gray-200 dark:bg-gray-600 rounded px-1 py-0.5">@X_LeadsBot</code>.</p>
+                         </div>
+                         <input type="text" id="wizard-telegram-id" placeholder="Paste your User ID here" class="w-full mt-2 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-between items-center">
+                    <button id="wizard-back-3" class="px-6 py-3 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Back</button>
+                    <button id="wizard-finish" class="px-6 py-3 text-white font-semibold rounded-lg btn-gradient">Finish Setup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== On-Demand Scan Modal (Initially Hidden) =========== -->
+    <div id="scanModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+        <div class="card w-full max-w-lg mx-auto p-6 sm:p-8 space-y-6 relative">
+            <!-- Close Button -->
+            <button id="closeScanModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <h3 class="text-2xl font-bold text-center">On-Demand Scan</h3>
+            <p class="text-center text-gray-600 dark:text-gray-300 -mt-4">Find fresh leads from a specific subreddit.</p>
+
+            <form id="scan-form" class="space-y-6">
+                <!-- Subreddit Selection -->
+                <div>
+                    <label for="scan-subreddit-input" class="block font-medium text-sm mb-1">Choose Subreddit</label>
+                    <input type="text" id="scan-subreddit-input" placeholder="e.g., r/SaaS or r/Entrepreneur" class="w-full p-3 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Number of Posts to Scan -->
+                <div>
+                    <label for="scan-post-count" class="block font-medium text-sm mb-1">Number of Posts to Scan: <span id="scan-post-count-value" class="font-bold text-blue-600 dark:text-blue-400">50</span></label>
+                    <input id="scan-post-count" type="range" min="10" max="100" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" oninput="document.getElementById('scan-post-count-value').textContent = this.value">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="pt-4 flex justify-end items-center gap-4">
+                    <button id="cancelScanBtn" type="button" class="px-6 py-3 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="submit" class="px-6 py-3 text-white font-semibold rounded-lg btn-gradient flex items-center justify-center w-36">Start Scan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- =========== NEW: Confirmation Modal =========== -->
+    <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-[99] p-4">
+        <div class="card w-full max-w-md mx-auto p-6 sm:p-8 space-y-6">
+            <h3 class="text-xl font-bold text-center">Confirm Action</h3>
+            <p id="confirmationMessage" class="text-center text-gray-600 dark:text-gray-300"></p>
+            <div class="mt-6 flex justify-end items-center gap-4">
+                <button id="confirmCancelBtn" class="px-6 py-2 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
+                <button id="confirmActionBtn" class="px-6 py-2 text-white font-semibold rounded-lg bg-red-600 hover:bg-red-700 transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========== Landing Page =========== -->
+    <div id="landingPage">
+        <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md fixed top-0 left-0 right-0 z-30 border-b border-gray-200 dark:border-gray-700">
+            <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+                <img src="https://carrev.shop/wp-content/uploads/2025/08/Xlead-logo.png" alt="Xlead Logo" class="h-20 w-auto">
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Features</a>
+                    <a href="#pricing" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Pricing</a>
+                    <a href="#about" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">About</a>
+                    <a href="#blog" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Blog</a>
+                    <a href="#contact" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Contact</a>
+                    <div id="auth-links-desktop" class="flex items-center">
+                        <button onclick="signInWithGoogle()" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Log In</button>
+                        <button onclick="signInWithGoogle()" class="ml-4 px-5 py-2 text-white font-semibold rounded-lg btn-gradient">Get Started</button>
+                    </div>
+                    <div id="user-profile-desktop" class="hidden items-center space-x-4">
+                        <img id="user-photo-desktop" class="h-10 w-10 rounded-full" src="" alt="User profile">
+                        <span id="user-name-desktop" class="font-semibold text-gray-700 dark:text-gray-200"></span>
+                        <button onclick="signOutUser()" class="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500">Log Out</button>
+                    </div>
+                    <!-- Dark Mode Toggle Button -->
+                    <button id="darkModeToggle" class="ml-4 text-gray-600 dark:text-gray-300 hover:text-blue-500 focus:outline-none">
+                        <i class="fas fa-moon text-xl block dark:hidden"></i>
+                        <i class="fas fa-sun text-xl hidden dark:block"></i>
+                    </button>
+                </nav>
+                <div class="md:hidden flex items-center">
+                        <!-- Dark Mode Toggle Button (Mobile) -->
+                    <button id="darkModeToggleMobile" class="mr-4 text-gray-700 dark:text-gray-300 focus:outline-none">
+                        <i class="fas fa-moon text-2xl block dark:hidden"></i>
+                        <i class="fas fa-sun text-2xl hidden dark:block"></i>
+                    </button>
+                    <button id="mobile-menu-button" class="text-gray-700 dark:text-gray-300 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <a href="#features" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Features</a>
+                <a href="#pricing" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Pricing</a>
+                <a href="#about" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">About</a>
+                <a href="#blog" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Blog</a>
+                <a href="#contact" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Contact</a>
+                <div id="auth-links-mobile" class="p-4 space-y-2">
+                    <a href="#" onclick="signInWithGoogle()" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Log In</a>
+                    <button onclick="signInWithGoogle()" class="w-full px-5 py-2 text-white font-semibold rounded-lg btn-gradient">Get Started</button>
+                </div>
+                <div id="user-profile-mobile" class="hidden items-center space-x-4 p-4 border-t dark:border-gray-700">
+                    <img id="user-photo-mobile" class="h-10 w-10 rounded-full" src="" alt="User profile">
+                    <div class="flex-grow">
+                        <span id="user-name-mobile" class="font-semibold text-gray-700 dark:text-gray-200 block"></span>
+                        <button onclick="signOutUser()" class="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500">Log Out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="pt-24">
+            <!-- A. Hero Section -->
+            <section class="text-center container mx-auto px-4 sm:px-6 py-16 md:py-20">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
+                    Stop Searching. Start <span class="text-gradient">Converting.</span>
+                </h2>
+                <p class="mt-6 max-w-3xl mx-auto text-base sm:text-lg text-gray-600 dark:text-gray-300">
+                    Xlead is a real-time intelligence platform that scans Reddit, X, YouTube, and more to find you customers who are ready to buy. Get real-time leads delivered straight to your dashboard.
+                </p>
+                <div class="mt-8">
+                    <button onclick="handlePlanSelection('free')" class="px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg text-white font-bold rounded-lg btn-gradient shadow-lg">
+                        Launch Dashboard & Start Free
+                    </button>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto h-48 sm:h-64 animated-graphic shadow-2xl"></div>
+            </section>
+
+            <!-- B. "How It Works" Section -->
+            <section class="container mx-auto px-4 sm:px-6 py-16 md:py-20">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl sm:text-4xl font-bold">Get Leads in 3 Simple Steps</h3>
+                </div>
+                <div class="grid md:grid-cols-3 gap-12 text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center h-20 w-20 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 mb-4"><i class="fa-solid fa-crosshairs text-3xl"></i></div>
+                        <h4 class="text-xl font-bold">1. Set Your Signals</h4>
+                        <p class="text-gray-600 dark:text-gray-300 mt-2">Define keywords, products, and competitors you want to track across multiple platforms.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center h-20 w-20 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400 mb-4"><i class="fa-solid fa-bell text-3xl"></i></div>
+                        <h4 class="text-xl font-bold">2. Get Real-Time Alerts</h4>
+                        <p class="text-gray-600 dark:text-gray-300 mt-2">Receive instant notifications in your dashboard or via Telegram the moment a relevant conversation happens.</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center h-20 w-20 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 mb-4"><i class="fa-solid fa-bolt-lightning text-3xl"></i></div>
+                        <h4 class="text-xl font-bold">3. Engage & Close</h4>
+                        <p class="text-gray-600 dark:text-gray-300 mt-2">Jump into conversations with high-intent leads and convert them into paying customers before your competition does.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Us Section -->
+            <section id="about" class="bg-white dark:bg-gray-800 py-16 md:py-20">
+                <div class="container mx-auto px-4 sm:px-6">
+                    <div class="grid md:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h3 class="text-3xl sm:text-4xl font-bold">Our Mission</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mt-4 text-lg">We believe that every business, big or small, deserves access to the tools that drive growth. SignalStream was born from the idea that finding new customers shouldn't be a game of chance. Our mission is to provide an affordable, powerful, and intuitive platform that surfaces high-intent leads from across the web, empowering you to connect with your next customer at the perfect moment.</p>
+                        </div>
+                        <div>
+                            <img src="https://placehold.co/600x400/3B82F6/FFFFFF?text=Our+Team" alt="Our Team" class="rounded-lg shadow-xl w-full">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- C. Features Section -->
+            <section id="features" class="py-16 md:py-20">
+                <div class="container mx-auto px-4 sm:px-6">
+                    <div class="text-center mb-12"><h3 class="text-3xl sm:text-4xl font-bold">A Powerful Toolkit for Growth</h3><p class="text-gray-600 dark:text-gray-300 mt-2">Everything you need to find and convert leads.</p></div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="card p-6 text-center"><i class="fa-solid fa-globe text-4xl mx-auto text-gradient"></i><h4 class="font-bold mt-4">Multi-Platform Monitoring</h4><p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Track keywords across Reddit, X (Twitter), YouTube, and more from a single dashboard.</p></div>
+                        <div class="card p-6 text-center"><i class="fa-solid fa-bullseye text-4xl mx-auto text-gradient"></i><h4 class="font-bold mt-4">Deal Analysis Engine</h4><p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Automatically analyze potential leads to gauge intent and purchase-readiness.</p></div>
+                        <div class="card p-6 text-center"><i class="fa-solid fa-right-left text-4xl mx-auto text-gradient"></i><h4 class="font-bold mt-4">Arbitrage Finder</h4><p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Discover opportunities where products are being requested that you can fulfill.</p></div>
+                        <div class="card p-6 text-center"><i class="fa-brands fa-telegram text-4xl mx-auto text-gradient"></i><h4 class="font-bold mt-4">Instant Telegram Alerts</h4><p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Get high-priority leads sent directly to your phone so you never miss an opportunity.</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blog Section -->
+            <section id="blog" class="bg-white dark:bg-gray-800 py-16 md:py-20">
+                <div class="container mx-auto px-4 sm:px-6">
+                    <div class="text-center mb-12"><h3 class="text-3xl sm:text-4xl font-bold">From the Blog</h3><p class="text-gray-600 dark:text-gray-300 mt-2">Tips, tricks, and insights on lead generation.</p></div>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="card overflow-hidden"><img src="https://placehold.co/600x400/14B8A6/FFFFFF?text=Blog+Post+1" alt="Blog Post 1" class="w-full h-48 object-cover"><div class="p-6"><h4 class="font-bold text-lg">5 Ways to Find Your First 100 Customers</h4><p class="text-gray-600 dark:text-gray-300 text-sm mt-2">Discover actionable strategies for acquiring your initial user base without a big budget.</p><a href="#" class="text-blue-600 dark:text-blue-400 font-semibold mt-4 inline-block">Read More &rarr;</a></div></div>
+                        <div class="card overflow-hidden"><img src="https://placehold.co/600x400/3B82F6/FFFFFF?text=Blog+Post+2" alt="Blog Post 2" class="w-full h-48 object-cover"><div class="p-6"><h4 class="font-bold text-lg">How to Use Reddit for Lead Generation</h4><p class="text-gray-600 dark:text-gray-300 text-sm mt-2">A deep dive into finding high-quality leads by monitoring conversations on Reddit.</p><a href="#" class="text-blue-600 dark:text-blue-400 font-semibold mt-4 inline-block">Read More &rarr;</a></div></div>
+                        <div class="card overflow-hidden"><img src="https://placehold.co/600x400/9333EA/FFFFFF?text=Blog+Post+3" alt="Blog Post 3" class="w-full h-48 object-cover"><div class="p-6"><h4 class="font-bold text-lg">The Art of the Follow-Up</h4><p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Learn how to effectively engage with potential customers after the initial contact.</p><a href="#" class="text-blue-600 dark:text-blue-400 font-semibold mt-4 inline-block">Read More &rarr;</a></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- D. Pricing Section -->
+            <section id="pricing" class="py-16 md:py-20">
+                <div class="container mx-auto px-4 sm:px-6">
+                    <div class="text-center mb-12"><h3 class="text-3xl sm:text-4xl font-bold">Find the Perfect Plan</h3><p class="text-gray-600 dark:text-gray-300 mt-2">Start for free, then upgrade as you grow.</p></div>
+                    <div id="pricing-toggle" class="bg-gray-200 dark:bg-gray-700 p-1 rounded-full flex w-fit mx-auto mb-10">
+                        <button onclick="updatePricing('monthly')" class="pricing-button w-1/3 px-4 sm:px-6 py-2 rounded-full text-sm font-semibold">Monthly</button>
+                        <button onclick="updatePricing('yearly')" class="pricing-button w-1/3 px-4 sm:px-6 py-2 rounded-full text-sm font-semibold">Yearly <span class="hidden sm:inline text-teal-400 dark:text-teal-300 ml-1">-25%</span></button>
+                        <button onclick="updatePricing('twoyear')" class="pricing-button w-1/3 px-4 sm:px-6 py-2 rounded-full text-sm font-semibold">2 Years <span class="hidden sm:inline text-teal-400 dark:text-teal-300 ml-1">-35%</span></button>
+                    </div>
+                    <div class="flex flex-col lg:flex-row justify-center items-center lg:items-stretch gap-8">
+                        <div class="card p-8 w-full max-w-sm flex flex-col"><h4 class="text-2xl font-semibold">Free</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$0" data-price-yearly="$0" data-price-twoyear="$0">$0</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> 50 Leads / month</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> 10 Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> YouTube & Forums Monitoring</li></ul><button onclick="handlePlanSelection('free')" class="mt-8 w-full py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Get Started</button></div>
+                        <div class="card p-8 w-full max-w-sm flex flex-col relative lg:pro-plan-highlight"><div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2"><span class="px-4 py-1 text-sm text-white font-bold bg-blue-500 rounded-full">MOST POPULAR</span></div><h4 class="text-2xl font-semibold">Pro</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$9" data-price-yearly="$6.75" data-price-twoyear="$5.85">$9</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Leads</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> YouTube & Forums Monitoring</li></ul><button onclick="handlePlanSelection('pro')" class="mt-8 w-full py-3 px-6 text-white font-semibold rounded-lg btn-gradient">Choose Pro</button></div>
+                        <div class="card p-8 w-full max-w-sm flex flex-col"><h4 class="text-2xl font-semibold">Elite</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$29" data-price-yearly="$21.75" data-price-twoyear="$18.85">$29</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Leads</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> YouTube & Forums Monitoring</li></ul><button onclick="handlePlanSelection('elite')" class="mt-8 w-full py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Choose Elite</button></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Us Section -->
+            <section id="contact" class="bg-white dark:bg-gray-800 py-16 md:py-20">
+                <div class="container mx-auto px-4 sm:px-6">
+                    <div class="text-center mb-12"><h3 class="text-3xl sm:text-4xl font-bold">Get in Touch</h3><p class="text-gray-600 dark:text-gray-300 mt-2">Have questions? We'd love to hear from you.</p></div>
+                    <div class="max-w-xl mx-auto">
+                        <form class="card p-8 space-y-6">
+                            <div><label for="name" class="block font-medium">Full Name</label><input type="text" id="name" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"></div>
+                            <div><label for="email" class="block font-medium">Email Address</label><input type="email" id="email" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"></div>
+                            <div><label for="message" class="block font-medium">Message</label><textarea id="message" rows="5" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"></textarea></div>
+                            <button type="submit" class="w-full py-3 px-4 text-white font-semibold rounded-lg btn-gradient">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div class="container mx-auto px-6 py-8">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div>
+                        <img src="https://carrev.shop/wp-content/uploads/2025/08/Whisk_3e11157b7b.jpg" alt="SignalStream Logo" class="h-10 w-auto mb-4">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">&copy; 2024 SignalStream. All rights reserved.</p>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 dark:text-gray-100">Product</h5>
+                        <nav class="mt-4 space-y-2"><a href="#features" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 block">Features</a><a href="#pricing" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 block">Pricing</a></nav>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 dark:text-gray-100">Company</h5>
+                        <nav class="mt-4 space-y-2"><a href="#about" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 block">About Us</a><a href="#blog" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 block">Blog</a><a href="#contact" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 block">Contact</a></nav>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 dark:text-gray-100">Connect</h5>
+                        <div class="flex space-x-4 mt-4">
+                            <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-500"><i class="fab fa-x-twitter text-xl"></i></a>
+                            <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-500"><i class="fab fa-youtube text-xl"></i></a>
+                            <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-blue-500"><i class="fab fa-reddit-alien text-xl"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- =========== Main Application Wrapper (Initially Hidden) =========== -->
+    <div id="appWrapper" class="hidden">
+        <div class="flex h-screen bg-gray-100 dark:bg-gray-900">
+            <!-- Sidebar -->
+            <aside id="app-sidebar" class="w-64 bg-white dark:bg-gray-800 shadow-lg flex-col z-10 absolute lg:relative inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+                <div class="p-6 border-b dark:border-gray-700 flex items-center justify-between">
+                    <img src="https://carrev.shop/wp-content/uploads/2025/08/Whisk_3e11157b7b.jpg" alt="SignalStream Logo" class="h-10 w-auto">
+                    <button id="close-sidebar-button" class="lg:hidden text-gray-600 dark:text-gray-300"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <nav class="flex-grow p-4 space-y-2">
+                    <a href="javascript:void(0);" id="nav-dashboard" class="sidebar-link" onclick="navigateTo('dashboardPage')"><i class="fa-solid fa-table-columns w-5 text-center"></i><span class="ml-3">Dashboard</span></a>
+                    <a href="javascript:void(0);" id="nav-analytics" class="sidebar-link" onclick="navigateTo('analyticsPage')"><i class="fa-solid fa-chart-bar w-5 text-center"></i><span class="ml-3">Analytics</span></a>
+                    <a href="javascript:void(0);" id="nav-settings" class="sidebar-link" onclick="navigateTo('settingsPage')"><i class="fa-solid fa-gear w-5 text-center"></i><span class="ml-3">Settings</span></a>
+                </nav>
+                 <div class="p-4 border-t dark:border-gray-700">
+                    <a href="javascript:void(0);" onclick="navigateTo('landingPage')" class="sidebar-link mb-2"><i class="fa-solid fa-house w-5 text-center"></i><span class="ml-3">Back to Home</span></a>
+                    <div class="text-center mb-4"><p class="text-sm font-semibold">Current Plan: <span id="current-plan-label" class="capitalize text-blue-600 dark:text-blue-400"></span></p><p class="text-xs text-gray-500 dark:text-gray-400">Switch plan to see UI changes:</p></div>
+                    <div class="flex justify-around"><button onclick="switchUserPlan('free')" class="text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-blue-500">Free</button><button onclick="switchUserPlan('pro')" class="text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-blue-500">Pro</button><button onclick="switchUserPlan('elite')" class="text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-blue-500">Elite</button></div>
+                    <button onclick="signOutUser()" class="w-full text-sm flex items-center justify-center mt-4 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fa-solid fa-right-from-bracket w-4 h-4 mr-2"></i> Log Out</button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <header class="lg:hidden bg-white dark:bg-gray-800 shadow-md p-4 flex items-center">
+                    <button id="open-sidebar-button" class="text-gray-700 dark:text-gray-300 focus:outline-none"><i class="fas fa-bars text-xl"></i></button>
+                    <h2 class="text-xl font-bold ml-4 text-gradient">SignalStream</h2>
+                </header>
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 p-4 sm:p-8 no-scrollbar">
+                    <!-- Dashboard Page Container -->
+                    <div id="dashboardPage" class="page-content">
+                        
+                        <!-- On-Demand Scan Results Section -->
+                        <div id="scanResultsWrapper" class="hidden mb-8">
+                            <div class="card p-6">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                                    <h3 class="text-xl font-bold">On-Demand Scan Results</h3>
+                                    <button id="clearScanResultsBtn" class="px-4 py-2 text-sm text-white font-semibold rounded-lg bg-red-500 hover:bg-red-600 transition w-full sm:w-auto">Clear Results</button>
+                                </div>
+                                <div id="scanResultsContainer" class="space-y-4">
+                                    <!-- Scan results will be injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Free Dashboard -->
+                        <div id="dashboardFree" class="dashboard-variant">
+                            <div class="card p-6"><h3 class="text-xl font-bold">My Monitor</h3><form id="free-monitor-form" class="mt-4 space-y-4"><input type="text" id="free-product-name" placeholder="Product Name (1 Max)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><textarea id="free-keywords" placeholder="Keywords (10 Max, comma-separated)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600" rows="3"></textarea><button type="submit" class="w-full py-2 px-4 text-white font-semibold rounded-lg btn-gradient">Save Monitor</button><p id="free-limit-error" class="text-red-500 text-sm hidden">You have reached the limits of the Free plan.</p></form></div>
+                            <div class="card p-6 mt-8"><h3 class="text-xl font-bold mb-4">Latest Leads</h3><div class="space-y-4"><div class="p-4 border dark:border-gray-700 rounded-lg flex items-center gap-4"><i class="fab fa-reddit-alien text-2xl text-red-500"></i><div><p class="font-semibold">Lead from Reddit</p><p class="text-sm text-gray-600 dark:text-gray-400">...looking for a simple CRM...</p></div></div><div class="p-4 border dark:border-gray-700 rounded-lg flex items-center gap-4"><i class="fab fa-x-twitter text-2xl text-black dark:text-white"></i><div><p class="font-semibold">Lead from X (Twitter)</p><p class="text-sm text-gray-600 dark:text-gray-400">...any good project management tools?...</p></div></div><div class="p-4 border dark:border-gray-700 rounded-lg flex items-center gap-4"><i class="fab fa-youtube text-2xl text-red-600"></i><div><p class="font-semibold">Lead from YouTube</p><p class="text-sm text-gray-600 dark:text-gray-400">...best note taking app for students...</p></div></div></div><div class="blurred-leads-container mt-4"><div class="space-y-4 blur-sm opacity-60"><div class="p-4 border dark:border-gray-700 rounded-lg h-16"></div><div class="p-4 border dark:border-gray-700 rounded-lg h-16"></div></div><div class="blur-overlay"><button onclick="navigateTo('landingPage')" class="text-center card p-4 sm:p-6 max-w-sm btn-gradient text-white font-bold">Upgrade to Pro to Unlock Unlimited Leads & Real-Time Feed!</button></div></div></div>
+                        </div>
+                        <!-- Pro Dashboard -->
+                        <div id="dashboardPro" class="dashboard-variant"><div class="p-4 bg-blue-100 dark:bg-blue-900/50 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 rounded-r-lg mb-6"><p class="text-sm"><b>You're on Pro!</b> <a href="javascript:void(0);" onclick="switchUserPlan('elite')" class="font-bold underline">Upgrade to Elite</a> to unlock Advanced Analytics!</p></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1 space-y-6"><div class="card p-6"><h3 class="text-xl font-bold">Add Monitor</h3><form id="pro-monitor-form" class="mt-4 space-y-4"><input type="text" id="pro-product-name" placeholder="Product Name" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><input type="text" id="pro-keywords" placeholder="Keywords (comma-separated)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><button type="submit" class="w-full py-2 px-4 text-white font-semibold rounded-lg btn-gradient">Add New Monitor</button></form></div><div class="card p-6"><h4 class="font-bold mb-4">Active Monitors</h4><div id="pro-monitors-list" class="space-y-4"></div></div></div><div class="lg:col-span-2 card p-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"><h3 class="text-xl font-bold">Live Leads Feed</h3><div class="flex items-center gap-2"><button id="openScanModalBtnPro" class="openScanModalBtn px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">⚡ Scan For Leads</button><button onclick="refreshLeads()" class="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt"></i></button></div></div><!-- Filter Buttons --><div id="pro-filter-controls" class="flex items-center gap-2 mb-4 border-b dark:border-gray-700 pb-4"></div><div id="pro-leads-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div><div id="pro-leads-footer" class="mt-4"></div></div></div></div>
+                        <!-- Elite Dashboard -->
+                        <div id="dashboardElite" class="dashboard-variant"><div class="grid grid-cols-1 lg:grid-cols-4 gap-8"><div class="lg:col-span-1 space-y-6"><div class="card p-6"><h3 class="text-xl font-bold">Add Monitor</h3><form id="elite-monitor-form" class="mt-4 space-y-4"><input type="text" id="elite-product-name" placeholder="Product Name" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><input type="text" id="elite-keywords" placeholder="Keywords" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><button type="submit" class="w-full py-2 px-4 text-white font-semibold rounded-lg btn-gradient">Add Monitor</button></form></div><div class="card p-6"><h4 class="font-bold mb-4">Active Monitors</h4><div id="elite-monitors-list" class="space-y-4"></div></div></div><div class="lg:col-span-3 card p-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"><div class="flex items-center gap-4"><h3 class="text-xl font-bold">Live Leads Feed</h3><button id="openScanModalBtnElite" class="openScanModalBtn px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">⚡ Scan For Leads</button></div><div class="flex items-center gap-2 sm:gap-4"><select class="p-2 border rounded-md text-sm w-full sm:w-auto bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><option>Filter by Platform</option><option>Reddit</option><option>X (Twitter)</option><option>YouTube</option></select><select class="p-2 border rounded-md text-sm w-full sm:w-auto bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><option>Sort by Date</option><option>Newest First</option><option>Oldest First</option></select><button onclick="refreshLeads()" class="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition"><i class="fas fa-sync-alt"></i></button></div></div><!-- Filter Buttons --><div id="elite-filter-controls" class="flex items-center gap-2 mb-4 border-b dark:border-gray-700 pb-4"></div><div id="elite-leads-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div><div id="elite-leads-footer" class="mt-4"></div></div></div></div>
+                    </div>
+
+                    <!-- Analytics Page Container -->
+                    <div id="analyticsPage" class="page-content"><div id="analyticsPro" class="analytics-variant"><h2 class="text-3xl font-bold mb-6">Analytics</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="card p-6 text-center"><h4 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Total Leads (This Month)</h4><p id="pro-analytics-total-leads" class="text-4xl font-bold mt-2">0</p></div><div class="card p-6 text-center"><h4 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Top Keyword</h4><p id="pro-analytics-top-keyword" class="text-4xl font-bold mt-2">-</p></div><div class="card p-6 text-center"><h4 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Top Platform</h4><p id="pro-analytics-top-platform" class="text-4xl font-bold mt-2">-</p></div></div><div class="card p-6 mt-8 text-center"><h3 class="text-xl font-bold">Unlock Advanced Analytics</h3><p class="text-gray-600 dark:text-gray-300 mt-2">Get detailed charts, trend analysis, and source breakdowns.</p><button onclick="switchUserPlan('elite')" class="mt-4 py-2 px-6 text-white font-semibold rounded-lg btn-gradient">Upgrade to Elite</button></div></div><div id="analyticsElite" class="analytics-variant"><h2 class="text-3xl font-bold mb-6">Advanced Analytics</h2><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="card p-6"><h3 class="font-bold mb-4">Lead Trends Over Time</h3><div id="leadTrendsLoader" class="flex justify-center items-center h-64"><div class="spinner"></div></div><canvas id="leadTrendsChart" class="hidden"></canvas></div><div class="card p-6"><h3 class="font-bold mb-4">Lead Source Breakdown</h3><div id="sourceBreakdownLoader" class="flex justify-center items-center h-64"><div class="spinner"></div></div><canvas id="sourceBreakdownChart" class="hidden"></canvas></div></div></div></div>
+
+                    <!-- Settings Page Container -->
+                    <div id="settingsPage" class="page-content">
+                        <h2 class="text-3xl font-bold mb-6">Settings</h2>
+                        <div class="card p-6 sm:p-8 max-w-3xl mx-auto">
+                            <form id="settings-form" class="space-y-8">
+                                <!-- Section 1: Account Information -->
+                                <div class="space-y-6">
+                                    <h3 class="text-lg font-semibold border-b dark:border-gray-700 pb-2">Account Information</h3>
+                                    <div>
+                                        <label for="full-name-input" class="block font-medium text-sm mb-1">Full Name</label>
+                                        <input type="text" id="full-name-input" class="w-full mt-1 p-2 border rounded-md bg-gray-100 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="email-input" class="block font-medium text-sm mb-1">Email Address</label>
+                                        <input type="email" id="email-input" class="w-full mt-1 p-2 border rounded-md bg-gray-100 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300" readonly>
+                                    </div>
+                                </div>
+
+                                <!-- Section 2: Business Profile -->
+                                <div class="space-y-6">
+                                    <h3 class="text-lg font-semibold border-b dark:border-gray-700 pb-2">Business Profile</h3>
+                                    <div>
+                                        <label for="settings-industry" class="block font-medium text-sm mb-1">Your Industry</label>
+                                        <select id="settings-industry" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                                            <option>Technology (SaaS)</option>
+                                            <option>Digital Marketing (Agency)</option>
+                                            <option>eCommerce</option>
+                                            <option>Real Estate</option>
+                                            <option>Consulting</option>
+                                            <option>Freelancer</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="settings-product-description" class="block font-medium text-sm mb-1">Briefly describe your product or service</label>
+                                        <textarea id="settings-product-description" rows="3" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., We provide AI-powered chatbots for customer support."></textarea>
+                                    </div>
+                                </div>
+                                
+                                <!-- Section 3: Customer Profile -->
+                                <div class="space-y-6">
+                                     <h3 class="text-lg font-semibold border-b dark:border-gray-700 pb-2">Customer Profile</h3>
+                                     <div>
+                                          <label for="settings-ideal-customer" class="block font-medium text-sm mb-1">Who is your ideal customer?</label>
+                                          <input type="text" id="settings-ideal-customer" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Small business owners, marketing managers">
+                                     </div>
+                                     <div>
+                                          <label for="settings-customer-problems" class="block font-medium text-sm mb-1">What main problems do you solve for your customers?</label>
+                                          <textarea id="settings-customer-problems" rows="3" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Reducing response times, increasing sales conversions"></textarea>
+                                     </div>
+                                </div>
+
+                                <!-- Section 4: Monitoring & Notifications -->
+                                <div class="space-y-6">
+                                    <h3 class="text-lg font-semibold border-b dark:border-gray-700 pb-2">Monitoring & Notifications</h3>
+                                    <div>
+                                        <label for="settings-keywords" class="block font-medium text-sm mb-1">Keywords to Monitor</label>
+                                        <input type="text" id="settings-keywords" placeholder="e.g., best CRM, social media tool, looking for developer" class="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Add multiple keywords separated by commas.</p>
+                                    </div>
+                                    <div>
+                                        <label class="block font-medium text-sm mb-1">Telegram Chat ID (for notifications)</label>
+                                        <div class="space-y-4 text-sm text-gray-700 dark:text-gray-300 mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border dark:border-gray-600">
+                                            <!-- Step 1 -->
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-100">Step 1: Get Your Telegram User ID</h4>
+                                                <p class="text-gray-600 dark:text-gray-300 mt-1">First, you need to find your unique User ID from a helper bot.</p>
+                                                <ol class="list-decimal list-inside mt-2 space-y-1 pl-2">
+                                                    <li>Open Telegram and search for this bot:
+                                                        <div class="inline-flex items-center bg-gray-200 dark:bg-gray-600 rounded-md p-1 my-1">
+                                                            <code id="user-info-bot-name" class="font-mono px-1">@userinfobot</code>
+                                                            <button type="button" onclick="copyToClipboard('user-info-bot-name', this)" class="ml-2 text-blue-500 hover:text-blue-700" title="Copy bot name">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                    <li>Start the bot. It will immediately send you your User ID.</li>
+                                                    <li>Copy that ID and paste it into the input field below.</li>
+                                                </ol>
+                                            </div>
+                                            <!-- Divider -->
+                                            <hr class="dark:border-gray-600">
+                                            <!-- Step 2 -->
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-100">Step 2: Start Our Notification Bot</h4>
+                                                <p class="text-gray-600 dark:text-gray-300 mt-1">Finally, you must start our bot to allow it to send you messages.</p>
+                                                <ol class="list-decimal list-inside mt-2 space-y-1 pl-2">
+                                                    <li>Search for our official bot:
+                                                         <div class="inline-flex items-center bg-gray-200 dark:bg-gray-600 rounded-md p-1 my-1">
+                                                            <code id="xleads-bot-name" class="font-mono px-1">@X_LeadsBot</code>
+                                                            <button type="button" onclick="copyToClipboard('xleads-bot-name', this)" class="ml-2 text-blue-500 hover:text-blue-700" title="Copy bot name">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                    <li>Start the bot. That's it! You will now receive lead notifications.</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                        <input type="text" id="telegram-input" placeholder="Paste your User ID here" class="w-full mt-2 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-4">
+                                    <button type="submit" class="w-full py-3 px-4 text-white font-semibold rounded-lg btn-gradient">Save All Settings</button>
+                                </div>
+                            </form>
+                            
+                            <div class="border-t dark:border-gray-700 pt-6 mt-8">
+                                <h3 class="text-lg font-bold">Your Unique Referral Link</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Share this link with others! You can see who signed up using your link in the future.</p>
+                                <div class="mt-4 flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-md">
+                                    <input type="text" id="referral-link-input" class="w-full bg-transparent border-0 focus:ring-0" readonly>
+                                    <button onclick="copyReferralLink()" class="py-2 px-4 text-sm text-white font-semibold rounded-md btn-gradient">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Notification Container -->
+    <div id="notification-container" class="fixed bottom-5 right-5 z-[100] w-full max-w-xs space-y-3"></div>
+
+    <script>
+    </script>
+    <script>
+    </script>
+    <script src="main.js"></script>
+</body>
+</html>

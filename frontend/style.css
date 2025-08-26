@@ -1,0 +1,71 @@
+/* --- Custom Design System --- */
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background-color: #F9FAFB; color: #1F2937; }
+/* Dark Mode Base */
+.dark body { background-color: #111827; color: #E5E7EB; }
+.dark .card { background-color: #1F2937; }
+.dark .sidebar-link:hover { background-color: #374151; }
+/* Gradients */
+.text-gradient { background: linear-gradient(to right, #3B82F6, #14B8A6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.btn-gradient { background: linear-gradient(to right, #3B82F6, #14B8A6); transition: all 0.3s ease; }
+.btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5); }
+/* Card Styling */
+.card { background-color: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+/* Highlighted Pro Plan */
+.pro-plan-highlight { border: 2px solid #3B82F6; box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); transform: scale(1.05); }
+/* Animated Graphic Placeholder */
+.animated-graphic { background: linear-gradient(-45deg, #3B82F6, #14B8A6, #9333ea, #f59e0b); background-size: 400% 400%; animation: gradient 15s ease infinite; border-radius: 12px; }
+@keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+/* Blurred Leads Effect for Free Tier */
+.blurred-leads-container { position: relative; }
+.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 12px; display: flex; justify-content: center; align-items: center; z-index: 10; }
+/* Sidebar Link Styling */
+.sidebar-link { display: flex; align-items: center; padding: 10px 16px; border-radius: 8px; color: #4B5563; font-weight: 500; transition: background-color 0.2s ease, color 0.2s ease; }
+.dark .sidebar-link { color: #D1D5DB; }
+.sidebar-link:hover { background-color: #F3F4F6; }
+.sidebar-link.active { background: linear-gradient(to right, #3B82F6, #14B8A6); color: white; box-shadow: 0 4px 12px -4px rgba(59, 130, 246, 0.6); }
+.dark .sidebar-link.active { color: white; }
+.sidebar-link.disabled { color: #9CA3AF; cursor: not-allowed; pointer-events: none; }
+.sidebar-link.premium-highlight.active { background: linear-gradient(to right, #a855f7, #ec4899); }
+/* Pricing Toggle */
+.pricing-button { color: #4B5563; transition: all 0.3s ease; border: 2px solid transparent; }
+.dark .pricing-button { color: #D1D5DB; }
+.pricing-button.active { background: linear-gradient(to right, #3B82F6, #14B8A6); color: white; box-shadow: 0 2px 8px -2px rgba(59, 130, 246, 0.6); }
+.dark .pricing-button.active { color: white; }
+/* Filter Button Styling */
+.filter-btn { padding: 6px 16px; border-radius: 9999px; font-weight: 500; font-size: 0.875rem; transition: all 0.2s ease-in-out; border: 1px solid #D1D5DB; color: #4B5563; }
+.dark .filter-btn { border-color: #4B5563; color: #D1D5DB; }
+.filter-btn:hover { background-color: #F3F4F6; }
+.dark .filter-btn:hover { background-color: #374151; }
+.filter-btn.active { background: linear-gradient(to right, #3B82F6, #14B8A6); color: white; border-color: transparent; }
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Loading Spinner */
+.spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #3B82F6; animation: spin 1s ease infinite; }
+.dark .spinner { border-color: rgba(255, 255, 255, 0.2); border-left-color: #3B82F6; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- NEW: Custom Notification Styling --- */
+.notification {
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+.notification-icon { font-size: 1.25rem; }
+.notification-info { background-color: #3B82F6; color: white; }
+.notification-success { background-color: #10B981; color: white; }
+.notification-error { background-color: #EF4444; color: white; }
+.dark .notification-info { background-color: #2563EB; }
+.dark .notification-success { background-color: #059669; }
+.dark .notification-error { background-color: #DC2626; }
