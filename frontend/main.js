@@ -147,6 +147,96 @@ confirmCancelBtn.addEventListener('click', () => {
     confirmCallback = null;
 });
 
+// --- Manage Monitors Modal ---
+const monitorsModal = document.getElementById('monitorsModal');
+const closeMonitorsModalBtn = document.getElementById('closeMonitorsModalBtn');
+
+function populateMonitorsModal() {
+    const list = document.getElementById('monitorsModalList');
+    if (!list) return;
+    const srcListId = currentUserPlan === 'pro'
+        ? 'pro-monitors-list'
+        : currentUserPlan === 'elite'
+            ? 'elite-monitors-list'
+            : null;
+    if (srcListId) {
+        const sourceList = document.getElementById(srcListId);
+        list.innerHTML = sourceList && sourceList.innerHTML ? sourceList.innerHTML : '<p class="text-sm text-gray-500 dark:text-gray-400">No active monitors yet.</p>';
+    } else {
+        list.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">Monitors are not available on the Free plan.</p>';
+    }
+}
+
+function openMonitorsModal() {
+    populateMonitorsModal();
+    monitorsModal.classList.remove('hidden');
+}
+
+function closeMonitorsModal() { monitorsModal.classList.add('hidden'); }
+
+// Use event delegation for the "Manage Monitors" button
+document.addEventListener('click', function(event) {
+    // Check for either the class OR the ID to make it more robust
+    if (event.target.closest('.manage-monitors-btn') || event.target.closest('#manageMonitorsBtn')) {
+        openMonitorsModal();
+    }
+});
+
+closeMonitorsModalBtn?.addEventListener('click', closeMonitorsModal);
+monitorsModal?.addEventListener('click', (e) => { if (e.target === monitorsModal) closeMonitorsModal(); });
+
+// --- Lead Detail Modal ---
+const leadDetailModal = document.getElementById('leadDetailModal');
+const closeLeadDetailModalBtn = document.getElementById('closeLeadDetailModalBtn');
+const leadDetailContent = document.getElementById('leadDetailContent');
+
+function openLeadDetailById(leadId) {
+    const lead = allLeads.find(l => l.id === leadId) || scanResultsLeads.find(l => l.id === leadId);
+    if (!lead) return;
+
+    const platformIcons = {
+        'Reddit': { icon: 'fa-reddit-alien', color: 'text-red-500' },
+        'X': { icon: 'fa-x-twitter', color: 'text-black dark:text-white' },
+        'YouTube': { icon: 'fa-youtube', color: 'text-red-600' },
+        'Facebook': { icon: 'fa-facebook', color: 'text-blue-600' },
+        'Forum': { icon: 'fa-comments', color: 'text-purple-600' }
+    };
+    const iconInfo = platformIcons[lead.source] || { icon: 'fa-question-circle', color: 'text-gray-500' };
+
+    let fullText = lead.text;
+    if (lead.keyword) {
+        const escapedKeyword = lead.keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        fullText = fullText.replace(new RegExp(escapedKeyword, 'gi'), match => `<strong class="text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 rounded-sm px-1">${match}</strong>`);
+    }
+
+    leadDetailContent.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fab ${iconInfo.icon} text-2xl ${iconInfo.color} flex-shrink-0"></i>
+            <div>
+                <p class="font-semibold text-gray-800 dark:text-gray-100">${lead.source}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Keyword: "${lead.keyword}"</p>
+            </div>
+        </div>
+        <p class="mt-4 text-gray-800 dark:text-gray-200 leading-relaxed text-sm">${fullText}</p>
+        <div class="mt-4 text-right">
+            <a href="${lead.url}" target="_blank" class="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">View Post &rarr;</a>
+        </div>
+    `;
+    leadDetailModal.classList.remove('hidden');
+}
+
+function closeLeadDetailModal() { leadDetailModal.classList.add('hidden'); }
+
+closeLeadDetailModalBtn?.addEventListener('click', closeLeadDetailModal);
+leadDetailModal?.addEventListener('click', (e) => { if (e.target === leadDetailModal) closeLeadDetailModal(); });
+
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('view-more')) {
+        const id = e.target.getAttribute('data-lead-id');
+        if (id) openLeadDetailById(id);
+    }
+});
+
 
 // --- Core Functions ---
 function switchUserPlan(newPlan) {
@@ -859,7 +949,6 @@ document.getElementById('clearScanResultsBtn').addEventListener('click', () => {
     scanResultsLeads = [];
 });
 
-
 function filterLeads(status) {
     currentFilter = status;
     leadsToShow = 5;
@@ -943,18 +1032,21 @@ function renderLeads(leads) {
     const proFilterControls = document.getElementById('pro-filter-controls');
     const eliteFilterControls = document.getElementById('elite-filter-controls');
     
+    if (!proFeed || !eliteFeed) return;
+
+
     proFeed.innerHTML = '';
     eliteFeed.innerHTML = '';
-    if(proFeedFooter) proFeedFooter.innerHTML = '';
-    if(eliteFeedFooter) eliteFeedFooter.innerHTML = '';
+    if (proFeedFooter) proFeedFooter.innerHTML = '';
+    if (eliteFeedFooter) eliteFeedFooter.innerHTML = '';
 
     const filterButtonsHtml = `
         <button onclick="filterLeads('all')" class="filter-btn ${currentFilter === 'all' ? 'active' : ''}">All Leads</button>
         <button onclick="filterLeads('starred')" class="filter-btn ${currentFilter === 'starred' ? 'active' : ''}">Starred</button>
         <button onclick="filterLeads('archived')" class="filter-btn ${currentFilter === 'archived' ? 'active' : ''}">Archived</button>
     `;
-    proFilterControls.innerHTML = filterButtonsHtml;
-    eliteFilterControls.innerHTML = filterButtonsHtml;
+    if (proFilterControls) proFilterControls.innerHTML = filterButtonsHtml;
+    if (eliteFilterControls) eliteFilterControls.innerHTML = filterButtonsHtml;
 
     let filteredLeads = leads;
     if (currentFilter === 'all') {
@@ -982,62 +1074,69 @@ function renderLeads(leads) {
 
     const leadsToDisplay = filteredLeads.slice(0, leadsToShow);
     let allLeadsHtml = '';
+    const MAX_TEXT_LENGTH = 160;
 
     leadsToDisplay.forEach(lead => {
         const iconInfo = platformIcons[lead.source] || { icon: 'fa-question-circle', color: 'text-gray-500' };
-        
-        let highlightedText = lead.text;
-        if (lead.keyword) {
-            const escapedKeyword = lead.keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-            highlightedText = lead.text.replace(new RegExp(escapedKeyword, 'gi'), (match) => `<strong class="text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 rounded-sm px-1">${match}</strong>`);
+        let displayText = lead.text;
+        let truncated = false;
+        if (displayText.length > MAX_TEXT_LENGTH) {
+            displayText = displayText.slice(0, MAX_TEXT_LENGTH) + '...';
+            truncated = true;
         }
         
-        let cardClasses = 'card p-5 transition-all duration-300';
+        if (lead.keyword) {
+            const escapedKeyword = lead.keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                      displayText = displayText.replace(new RegExp(escapedKeyword, 'gi'), match => `<strong class="text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 rounded-sm px-1">${match}</strong>`);
+        }
+
+        let cardClasses = 'card p-6 flex flex-col h-full space-y-4 transition-all duration-300';
         if (lead.status === 'archived') cardClasses += ' opacity-50';
         if (lead.status === 'starred') cardClasses += ' ring-2 ring-yellow-400 dark:ring-yellow-500';
         const starIconClass = lead.status === 'starred' ? 'text-yellow-400' : 'text-gray-400';
 
         const leadHtml = `
-        <div class="${cardClasses} flex flex-col h-full">
+        <div class="${cardClasses}">
             <!-- Card Header -->
             <div class="flex justify-between items-start">
                 <div class="flex items-center gap-3 overflow-hidden">
                     <i class="fab ${iconInfo.icon} text-2xl ${iconInfo.color} w-6 text-center flex-shrink-0"></i>
                     <div class="truncate">
                         <p class="font-semibold text-gray-800 dark:text-gray-100 truncate">${lead.source}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">Keyword: "${lead.keyword}"</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">Keyword: \"${lead.keyword}\"</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-1 flex-shrink-0 -mr-2 -mt-2">
-                    <button onclick="updateLeadStatus('${lead.id}', '${lead.status === 'starred' ? 'active' : 'starred'}')" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Star Lead">
-                        <i class="fas fa-star text-lg ${starIconClass} hover:text-yellow-500 transition-colors"></i>
+                    <button onclick=\"updateLeadStatus('${lead.id}', '${lead.status === 'starred' ? 'active' : 'starred'}')\" class=\"p-2 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\" title=\"Star Lead\">
+                        <i class=\"fas fa-star text-lg ${starIconClass} hover:text-yellow-500 transition-colors\"></i>
                     </button>
-                    <button onclick="updateLeadStatus('${lead.id}', 'archived')" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-colors" title="Archive Lead">
-                        <i class="fas fa-archive text-lg"></i>
+                    <button onclick=\"updateLeadStatus('${lead.id}', 'archived')\" class=\"p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-colors\" title=\"Archive Lead\">
+                        <i class=\"fas fa-archive text-lg\"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Card Body -->
-            <div class="py-4 flex-grow">
-                <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">${highlightedText}</p>
+            <div class="flex-grow">
+                <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">${displayText}</p>
+                ${truncated ? `<button class="view-more mt-2 text-sm font-semibold text-blue-600 dark:text-blue-400" data-lead-id="${lead.id}">View More</button>` : ''}
             </div>
 
             <!-- AI Insights Section -->
             ${lead.analysis ? `
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-gray-500 dark:text-gray-400">🔥 Buying Intent</span>
-                    <span class="font-bold text-gray-800 dark:text-gray-200">${lead.analysis.intent_score || 'N/A'}</span>
+            <div class=\"border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3\">
+                <div class=\"flex justify-between items-center text-sm\">
+                    <span class=\"text-gray-500 dark:text-gray-400\">🔥 Buying Intent</span>
+                    <span class=\"font-bold text-gray-800 dark:text-gray-200\">${lead.analysis.intent_score || 'N/A'}</span>
                 </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-gray-500 dark:text-gray-400">👤 Customer Persona</span>
-                    <span class="font-bold text-gray-800 dark:text-gray-200">${lead.analysis.customer_persona || 'N/A'}</span>
+                <div class=\"flex justify-between items-center text-sm\">
+                    <span class=\"text-gray-500 dark:text-gray-400\">👤 Customer Persona</span>
+                    <span class=\"font-bold text-gray-800 dark:text-gray-200\">${lead.analysis.customer_persona || 'N/A'}</span>
                 </div>
                 ${(lead.analysis.pain_points && Array.isArray(lead.analysis.pain_points) && lead.analysis.pain_points.length > 0) ? `
                 <div>
-                    <div class="flex flex-wrap gap-2">
-                        ${lead.analysis.pain_points.map(point => `<span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">${point}</span>`).join('')}
+                    <div class=\"flex flex-wrap gap-2\">
+                        ${lead.analysis.pain_points.map(point => `<span class=\"inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300\">${point}</span>`).join('')}
                     </div>
                 </div>
                 ` : ''}
@@ -1066,8 +1165,8 @@ function renderLeads(leads) {
 
     if (filteredLeads.length > leadsToShow) {
         const showMoreButton = `<button onclick="showMoreLeads()" class="w-full py-2 px-4 text-sm text-blue-600 dark:text-blue-400 font-semibold rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition col-span-full">Show More</button>`;
-        if(proFeedFooter) proFeedFooter.innerHTML = showMoreButton;
-        if(eliteFeedFooter) eliteFeedFooter.innerHTML = showMoreButton;
+        if (proFeedFooter) proFeedFooter.innerHTML = showMoreButton;
+        if (eliteFeedFooter) eliteFeedFooter.innerHTML = showMoreButton;
     }
 }
 
@@ -1242,4 +1341,4 @@ async function getAiReply(leadId, buttonElement) {
 }
 
 window.getAiReply = getAiReply;
-window.copyReply = copyReply;
+window.copyReply = copyR
