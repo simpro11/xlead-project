@@ -19,6 +19,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+    </style>
+    <script>
+    </script>
 </head>
 <body class="antialiased bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
@@ -87,7 +91,7 @@
                     <div>
                          <label class="block font-medium text-sm mb-1">Telegram Chat ID (for notifications)</label>
                          <div class="space-y-2 text-xs text-gray-700 dark:text-gray-300 mt-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border dark:border-gray-600">
-                                  <p>Get your User ID from <code class="font-mono bg-gray-200 dark:bg-gray-600 rounded px-1 py-0.5">@userinfobot</code> on Telegram, then start our bot <code class="font-mono bg-gray-200 dark:bg-gray-600 rounded px-1 py-0.5">@X_LeadsBot</code>.</p>
+                                <p>Get your User ID from <code class="font-mono bg-gray-200 dark:bg-gray-600 rounded px-1 py-0.5">@userinfobot</code> on Telegram, then start our bot <code class="font-mono bg-gray-200 dark:bg-gray-600 rounded px-1 py-0.5">@X_LeadsBot</code>.</p>
                          </div>
                          <input type="text" id="wizard-telegram-id" placeholder="Paste your User ID here" class="w-full mt-2 p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500">
                     </div>
@@ -145,28 +149,7 @@
         </div>
     </div>
 
-    <!-- =========== Manage Monitors Modal =========== -->
-    <div id="monitorsModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-        <div class="card w-full max-w-md mx-auto p-6 sm:p-8 space-y-6 relative">
-            <button id="closeMonitorsModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
-            <h3 class="text-2xl font-bold text-center">Manage Monitors</h3>
-            <div id="monitorsModalList" class="space-y-4"></div>
-        </div>
-    </div>
 
-    <!-- =========== Lead Detail Modal =========== -->
-    <div id="leadDetailModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-        <div class="card w-full max-w-lg mx-auto p-6 sm:p-8 space-y-6 relative">
-            <button id="closeLeadDetailModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
-            <h3 class="text-2xl font-bold text-center">Lead Details</h3>
-            <div id="leadDetailContent" class="space-y-4 text-sm"></div>
-        </div>
-    </div>
-    
     <!-- =========== Landing Page =========== -->
     <div id="landingPage">
         <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md fixed top-0 left-0 right-0 z-30 border-b border-gray-200 dark:border-gray-700">
@@ -179,8 +162,8 @@
                     <a href="#blog" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Blog</a>
                     <a href="#contact" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Contact</a>
                     <div id="auth-links-desktop" class="flex items-center">
-                        <button id="login-btn-desktop" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Log In</button>
-                        <button id="get-started-btn-desktop" class="ml-4 px-5 py-2 text-white font-semibold rounded-lg btn-gradient">Get Started</button>
+                        <button onclick="signInWithGoogle()" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 font-medium">Log In</button>
+                        <button onclick="signInWithGoogle()" class="ml-4 px-5 py-2 text-white font-semibold rounded-lg btn-gradient">Get Started</button>
                     </div>
                     <div id="user-profile-desktop" class="hidden items-center space-x-4">
                         <img id="user-photo-desktop" class="h-10 w-10 rounded-full" src="" alt="User profile">
@@ -212,8 +195,8 @@
                 <a href="#blog" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Blog</a>
                 <a href="#contact" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Contact</a>
                 <div id="auth-links-mobile" class="p-4 space-y-2">
-                    <a href="#" id="login-btn-mobile" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Log In</a>
-                    <button id="get-started-btn-mobile" class="w-full px-5 py-2 text-white font-semibold rounded-lg btn-gradient">Get Started</button>
+                    <a href="#" onclick="signInWithGoogle()" class="block py-3 px-4 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Log In</a>
+                    <button onclick="signInWithGoogle()" class="w-full px-5 py-2 text-white font-semibold rounded-lg btn-gradient">Get Started</button>
                 </div>
                 <div id="user-profile-mobile" class="hidden items-center space-x-4 p-4 border-t dark:border-gray-700">
                     <img id="user-photo-mobile" class="h-10 w-10 rounded-full" src="" alt="User profile">
@@ -235,7 +218,7 @@
                     Xlead is a real-time intelligence platform that scans Reddit, X, YouTube, and more to find you customers who are ready to buy. Get real-time leads delivered straight to your dashboard.
                 </p>
                 <div class="mt-8">
-                    <button id="launch-dashboard-btn" class="px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg text-white font-bold rounded-lg btn-gradient shadow-lg">
+                    <button onclick="handlePlanSelection('free')" class="px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg text-white font-bold rounded-lg btn-gradient shadow-lg">
                         Launch Dashboard & Start Free
                     </button>
                 </div>
@@ -316,9 +299,9 @@
                         <button onclick="updatePricing('twoyear')" class="pricing-button w-1/3 px-4 sm:px-6 py-2 rounded-full text-sm font-semibold">2 Years <span class="hidden sm:inline text-teal-400 dark:text-teal-300 ml-1">-35%</span></button>
                     </div>
                     <div class="flex flex-col lg:flex-row justify-center items-center lg:items-stretch gap-8">
-                        <div class="card p-8 w-full max-w-sm flex flex-col"><h4 class="text-2xl font-semibold">Free</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$0" data-price-yearly="$0" data-price-twoyear="$0">$0</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> 50 Leads / month</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> 10 Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> YouTube & Forums Monitoring</li></ul><button data-plan="free" class="plan-select-btn mt-8 w-full py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Get Started</button></div>
-                        <div class="card p-8 w-full max-w-sm flex flex-col relative lg:pro-plan-highlight"><div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2"><span class="px-4 py-1 text-sm text-white font-bold bg-blue-500 rounded-full">MOST POPULAR</span></div><h4 class="text-2xl font-semibold">Pro</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$9" data-price-yearly="$6.75" data-price-twoyear="$5.85">$9</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Leads</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> YouTube & Forums Monitoring</li></ul><button data-plan="pro" class="plan-select-btn mt-8 w-full py-3 px-6 text-white font-semibold rounded-lg btn-gradient">Choose Pro</button></div>
-                        <div class="card p-8 w-full max-w-sm flex flex-col"><h4 class="text-2xl font-semibold">Elite</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$29" data-price-yearly="$21.75" data-price-twoyear="$18.85">$29</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Leads</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> YouTube & Forums Monitoring</li></ul><button data-plan="elite" class="plan-select-btn mt-8 w-full py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Choose Elite</button></div>
+                        <div class="card p-8 w-full max-w-sm flex flex-col"><h4 class="text-2xl font-semibold">Free</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$0" data-price-yearly="$0" data-price-twoyear="$0">$0</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> 50 Leads / month</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> 10 Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> YouTube & Forums Monitoring</li></ul><button onclick="handlePlanSelection('free')" class="mt-8 w-full py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Get Started</button></div>
+                        <div class="card p-8 w-full max-w-sm flex flex-col relative lg:pro-plan-highlight"><div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2"><span class="px-4 py-1 text-sm text-white font-bold bg-blue-500 rounded-full">MOST POPULAR</span></div><h4 class="text-2xl font-semibold">Pro</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$9" data-price-yearly="$6.75" data-price-twoyear="$5.85">$9</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Leads</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center text-gray-400 dark:text-gray-500"><i class="fa-solid fa-xmark text-red-400 mr-3"></i> YouTube & Forums Monitoring</li></ul><button onclick="handlePlanSelection('pro')" class="mt-8 w-full py-3 px-6 text-white font-semibold rounded-lg btn-gradient">Choose Pro</button></div>
+                        <div class="card p-8 w-full max-w-sm flex flex-col"><h4 class="text-2xl font-semibold">Elite</h4><div class="mt-6"><span class="text-5xl font-bold" data-price-monthly="$29" data-price-yearly="$21.75" data-price-twoyear="$18.85">$29</span><span class="text-gray-500 dark:text-gray-400 font-medium">/ mo</span></div><p class="billing-total-text text-gray-500 dark:text-gray-400 text-sm mt-1 h-5"></p><ul class="mt-8 space-y-4 text-gray-700 dark:text-gray-300 flex-grow"><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Leads</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Unlimited Keywords</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Reddit Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> X (Twitter) Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Marketplace Monitoring</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> Deal Analysis Engine</li><li class="flex items-center"><i class="fa-solid fa-check text-teal-500 mr-3"></i> YouTube & Forums Monitoring</li></ul><button onclick="handlePlanSelection('elite')" class="mt-8 w-full py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">Choose Elite</button></div>
                     </div>
                 </div>
             </section>
@@ -399,12 +382,6 @@
                 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 p-4 sm:p-8 no-scrollbar">
                     <!-- Dashboard Page Container -->
                     <div id="dashboardPage" class="page-content">
-                    
-                        <!-- Dashboard Header -->
-                        <div class="flex justify-end mb-4">
-                            <button id="manageMonitorsBtn" class="px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">Manage Monitors</button>
-                        </div>
-
                         
                         <!-- On-Demand Scan Results Section -->
                         <div id="scanResultsWrapper" class="hidden mb-8">
@@ -425,50 +402,9 @@
                             <div class="card p-6 mt-8"><h3 class="text-xl font-bold mb-4">Latest Leads</h3><div class="space-y-4"><div class="p-4 border dark:border-gray-700 rounded-lg flex items-center gap-4"><i class="fab fa-reddit-alien text-2xl text-red-500"></i><div><p class="font-semibold">Lead from Reddit</p><p class="text-sm text-gray-600 dark:text-gray-400">...looking for a simple CRM...</p></div></div><div class="p-4 border dark:border-gray-700 rounded-lg flex items-center gap-4"><i class="fab fa-x-twitter text-2xl text-black dark:text-white"></i><div><p class="font-semibold">Lead from X (Twitter)</p><p class="text-sm text-gray-600 dark:text-gray-400">...any good project management tools?...</p></div></div><div class="p-4 border dark:border-gray-700 rounded-lg flex items-center gap-4"><i class="fab fa-youtube text-2xl text-red-600"></i><div><p class="font-semibold">Lead from YouTube</p><p class="text-sm text-gray-600 dark:text-gray-400">...best note taking app for students...</p></div></div></div><div class="blurred-leads-container mt-4"><div class="space-y-4 blur-sm opacity-60"><div class="p-4 border dark:border-gray-700 rounded-lg h-16"></div><div class="p-4 border dark:border-gray-700 rounded-lg h-16"></div></div><div class="blur-overlay"><button onclick="navigateTo('landingPage')" class="text-center card p-4 sm:p-6 max-w-sm btn-gradient text-white font-bold">Upgrade to Pro to Unlock Unlimited Leads & Real-Time Feed!</button></div></div></div>
                         </div>
                         <!-- Pro Dashboard -->
-                        <div id="dashboardPro" class="dashboard-variant">
-                            <div class="p-4 bg-blue-100 dark:bg-blue-900/50 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 rounded-r-lg mb-6"><p class="text-sm"><b>You're on Pro!</b> <a href="javascript:void(0);" onclick="switchUserPlan('elite')" class="font-bold underline">Upgrade to Elite</a> to unlock Advanced Analytics!</p></div>
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                <!-- DELETED: Monitor Panel was here -->
-                                <div class="lg:col-span-3 card p-6">
-                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                                        <h3 class="text-xl font-bold">Live Leads Feed</h3>
-                                        <div class="flex items-center gap-2">
-                                            <button class="openScanModalBtn px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">⚡ Scan For Leads</button>
-                                            <button class="manage-monitors-btn px-4 py-2 text-sm font-semibold rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">⚙️ Manage Monitors</button>
-                                            <button onclick="refreshLeads()" class="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt"></i></button>
-                                        </div>
-                                    </div>
-                                    <!-- Filter Buttons -->
-                                    <div id="pro-filter-controls" class="flex items-center gap-2 mb-4 border-b dark:border-gray-700 pb-4"></div>
-                                    <div id="pro-leads-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-                                    <div id="pro-leads-footer" class="mt-4"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="dashboardPro" class="dashboard-variant"><div class="p-4 bg-blue-100 dark:bg-blue-900/50 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 rounded-r-lg mb-6"><p class="text-sm"><b>You're on Pro!</b> <a href="javascript:void(0);" onclick="switchUserPlan('elite')" class="font-bold underline">Upgrade to Elite</a> to unlock Advanced Analytics!</p></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1 space-y-6"><div class="card p-6"><h3 class="text-xl font-bold">Add Monitor</h3><form id="pro-monitor-form" class="mt-4 space-y-4"><input type="text" id="pro-product-name" placeholder="Product Name" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><input type="text" id="pro-keywords" placeholder="Keywords (comma-separated)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><button type="submit" class="w-full py-2 px-4 text-white font-semibold rounded-lg btn-gradient">Add New Monitor</button></form></div><div class="card p-6"><h4 class="font-bold mb-4">Active Monitors</h4><div id="pro-monitors-list" class="space-y-4"></div></div></div><div class="lg:col-span-2 card p-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"><h3 class="text-xl font-bold">Live Leads Feed</h3><div class="flex items-center gap-2"><button id="openScanModalBtnPro" class="openScanModalBtn px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">⚡ Scan For Leads</button><button onclick="refreshLeads()" class="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt"></i></button></div></div><!-- Filter Buttons --><div id="pro-filter-controls" class="flex items-center gap-2 mb-4 border-b dark:border-gray-700 pb-4"></div><div id="pro-leads-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div><div id="pro-leads-footer" class="mt-4"></div></div></div></div>
                         <!-- Elite Dashboard -->
-                        <div id="dashboardElite" class="dashboard-variant">
-                            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                                <!-- DELETED: Monitor Panel was here -->
-                                <div class="lg:col-span-4 card p-6">
-                                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                                        <div class="flex items-center gap-4">
-                                            <h3 class="text-xl font-bold">Live Leads Feed</h3>
-                                            <button class="openScanModalBtn px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">⚡ Scan For Leads</button>
-                                            <button class="manage-monitors-btn px-4 py-2 text-sm font-semibold rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">⚙️ Manage Monitors</button>
-                                        </div>
-                                        <div class="flex items-center gap-2 sm:gap-4">
-                                            <select class="p-2 border rounded-md text-sm w-full sm:w-auto bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><option>Filter by Platform</option><option>Reddit</option><option>X (Twitter)</option><option>YouTube</option></select>
-                                            <select class="p-2 border rounded-md text-sm w-full sm:w-auto bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><option>Sort by Date</option><option>Newest First</option><option>Oldest First</option></select>
-                                            <button onclick="refreshLeads()" class="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition"><i class="fas fa-sync-alt"></i></button>
-                                        </div>
-                                    </div>
-                                    <!-- Filter Buttons -->
-                                    <div id="elite-filter-controls" class="flex items-center gap-2 mb-4 border-b dark:border-gray-700 pb-4"></div>
-                                    <div id="elite-leads-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-                                    <div id="elite-leads-footer" class="mt-4"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="dashboardElite" class="dashboard-variant"><div class="grid grid-cols-1 lg:grid-cols-4 gap-8"><div class="lg:col-span-1 space-y-6"><div class="card p-6"><h3 class="text-xl font-bold">Add Monitor</h3><form id="elite-monitor-form" class="mt-4 space-y-4"><input type="text" id="elite-product-name" placeholder="Product Name" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><input type="text" id="elite-keywords" placeholder="Keywords" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><button type="submit" class="w-full py-2 px-4 text-white font-semibold rounded-lg btn-gradient">Add Monitor</button></form></div><div class="card p-6"><h4 class="font-bold mb-4">Active Monitors</h4><div id="elite-monitors-list" class="space-y-4"></div></div></div><div class="lg:col-span-3 card p-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"><div class="flex items-center gap-4"><h3 class="text-xl font-bold">Live Leads Feed</h3><button id="openScanModalBtnElite" class="openScanModalBtn px-4 py-2 text-sm text-white font-semibold rounded-lg btn-gradient">⚡ Scan For Leads</button></div><div class="flex items-center gap-2 sm:gap-4"><select class="p-2 border rounded-md text-sm w-full sm:w-auto bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><option>Filter by Platform</option><option>Reddit</option><option>X (Twitter)</option><option>YouTube</option></select><select class="p-2 border rounded-md text-sm w-full sm:w-auto bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"><option>Sort by Date</option><option>Newest First</option><option>Oldest First</option></select><button onclick="refreshLeads()" class="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition"><i class="fas fa-sync-alt"></i></button></div></div><!-- Filter Buttons --><div id="elite-filter-controls" class="flex items-center gap-2 mb-4 border-b dark:border-gray-700 pb-4"></div><div id="elite-leads-feed" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div><div id="elite-leads-footer" class="mt-4"></div></div></div></div>
                     </div>
 
                     <!-- Analytics Page Container -->
@@ -600,48 +536,10 @@
     <!-- Custom Notification Container -->
     <div id="notification-container" class="fixed bottom-5 right-5 z-[100] w-full max-w-xs space-y-3"></div>
 
+    <script>
+    </script>
+    <script>
+    </script>
     <script src="main.js"></script>
-
-    <!-- NEW: Monitors Modal -->
-    <div id="leadDetailModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex justify-center items-center z-[99] p-4 opacity-0 transition-opacity duration-300">
-    <div id="modal-content" class="card w-full max-w-3xl max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300">
-        <div class="flex justify-between items-center p-4 border-b dark:border-gray-700 flex-shrink-0">
-            <div id="modal-header-content" class="flex items-center gap-3">
-                </div>
-            <button id="closeLeadDetailModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
-        </div>
-        <div id="modal-body-content" class="p-6 space-y-6 overflow-y-auto no-scrollbar">
-            </div>
-        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 mt-auto flex-shrink-0">
-            <a id="modal-view-source-link" href="#" target="_blank" class="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-                View Original Conversation &rarr;
-            </a>
-        </div>
-    </div>
-</div>
-    <div id="monitorsModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-        <div class="card w-full max-w-2xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
-                <h3 class="text-xl font-bold">Manage Monitors</h3>
-                <button id="closeMonitorsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-            <div class="p-6 space-y-8 overflow-y-auto">
-                <div>
-                    <h4 class="text-lg font-semibold">Add New Monitor</h4>
-                    <form id="modal-monitor-form" class="mt-4 space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                        <input type="text" id="modal-product-name" placeholder="Product Name" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600" required>
-                        <textarea id="modal-keywords" placeholder="Keywords (comma-separated)" class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600" rows="3" required></textarea>
-                        <button type="submit" class="w-full py-2 px-4 text-white font-semibold rounded-lg btn-gradient">Add Monitor</button>
-                    </form>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold">Active Monitors</h4>
-                    <div id="modal-monitors-list" class="mt-4 space-y-3"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
